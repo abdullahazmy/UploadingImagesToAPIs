@@ -1,0 +1,6 @@
+@Day4API_HostAddress = http://localhost:5010
+
+GET {{Day4API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
