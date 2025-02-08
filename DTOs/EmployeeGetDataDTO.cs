@@ -9,6 +9,7 @@
 
         public string EmployeeDepartmentName { get; set; }
         public string DepartmentDescription { get; set; }
+
         public IFormFile Image { get; set; }
     }
 }

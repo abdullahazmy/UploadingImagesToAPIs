@@ -10,4 +10,5 @@
 
         public virtual List<Project_Department> Project_Departments { get; set; } = new List<Project_Department>();
     }
+
 }

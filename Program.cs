@@ -1,5 +1,6 @@
 
 using Day4API.Models;
+using Day4API.Repository;
 using Microsoft.EntityFrameworkCore;
 
 namespace Day4API
@@ -22,6 +23,11 @@ namespace Day4API
             {
                 options.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
+
+            //builder.Services.AddScoped<EmployeeRepository>();
+            //builder.Services.AddScoped<GenericRepository<Employee>>(); // Add Generic Repository to the container for Employee to use it in EmployeeController Constructor
+            //builder.Services.AddScoped<GenericRepository<Department>>(); // Add Generic Repository to the container for Department to use it in DepartmentController Constructor
+            builder.Services.AddScoped<UnitOfWork>(); // Add UnitOfWork to the container to use it in UnitedController Constructor
 
             var app = builder.Build();
 

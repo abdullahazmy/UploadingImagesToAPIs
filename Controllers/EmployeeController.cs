@@ -1,7 +1,7 @@
 ﻿using Day4API.DTOs;
 using Day4API.Models;
+using Day4API.Repository;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Day4API.Controllers
 {
@@ -9,17 +9,17 @@ namespace Day4API.Controllers
     [ApiController]
     public class EmployeeController : ControllerBase
     {
-        CompanyContext _context;
-        public EmployeeController(CompanyContext context)
+        UnitOfWork _repository;
+        public EmployeeController(UnitOfWork _unitOfWork)
         {
-            _context = context;
+            this._repository = _unitOfWork;
         }
 
         [HttpGet]
         public IActionResult GetAll()
         {
             // Eager Loading for Department
-            List<Employee> e = _context.Employees.Include(emp => emp.Department).ToList();
+            List<Employee> e = _repository.Employee.SelectAll();
             List<EmployeeGetDataDTO> emp = new List<EmployeeGetDataDTO>();
 
             foreach (var item in e)
@@ -28,26 +28,35 @@ namespace Day4API.Controllers
                 {
                     Employee_ID = item.Id,
                     Employee_Name = item.Name,
-                    EmployeeDepartmentName = item.Department.Name
+                    EmployeeDepartmentName = item.Department.Name,
+                    DepartmentDescription = item.Department.Description,
+                    Department_ID = item.DepartmentId
                 });
             }
+
             return Ok(emp);
         }
 
         [HttpPost]
         public IActionResult Add(EmployeeGetDataDTO emp)
         {
+            // Check if the department already exists
+            var existingDepartment = _repository.Employee.SelectAll().FirstOrDefault(d => d.Department.Name == emp.EmployeeDepartmentName)?.Department;
+
             Employee e = new Employee
             {
                 Name = emp.Employee_Name,
-                DepartmentId = emp.Department_ID,
-                Department = new Department { Name = emp.EmployeeDepartmentName, Description = emp.DepartmentDescription }
+                DepartmentId = existingDepartment.Id, // Use existing department
+                Department = existingDepartment
             };
 
-            _context.Employees.Add(e);
-            _context.SaveChanges();
+            _repository.Employee.Add(e);
 
-            //return CreatedAtAction(nameof(GetAll), new { });
+            string _Path = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+            FileStream _Stream = new FileStream(Path.Combine(_Path, e.Id + emp.Image.FileName), FileMode.Create);
+            emp.Image.CopyTo(_Stream); // Save the image
+
+            _repository.Save();
             return Ok(emp);
         }
     }
