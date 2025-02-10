@@ -2,6 +2,8 @@
 using Day4API.Models;
 using Day4API.Repository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Day4API
 {
@@ -28,6 +30,19 @@ namespace Day4API
             //builder.Services.AddScoped<GenericRepository<Employee>>(); // Add Generic Repository to the container for Employee to use it in EmployeeController Constructor
             //builder.Services.AddScoped<GenericRepository<Department>>(); // Add Generic Repository to the container for Department to use it in DepartmentController Constructor
             builder.Services.AddScoped<UnitOfWork>(); // Add UnitOfWork to the container to use it in UnitedController Constructor
+
+            builder.Services.AddAuthentication(op => op.DefaultAuthenticateScheme = "TokenSchema")
+                .AddJwtBearer("TokenSchema", action =>
+                {
+                    action.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("MYSECRETKEYISSANDsoil123@#!@and here am creating my scret key to test it hahahah"))
+                    };
+                });
 
             var app = builder.Build();
 
