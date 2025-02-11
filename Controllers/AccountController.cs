@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Swashbuckle.AspNetCore.Annotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -11,6 +12,10 @@ namespace Day4API.Controllers
     public class AccountController : ControllerBase
     {
         [HttpGet]
+        [SwaggerOperation(Summary = "Generating the Token, it takes user details and returns the token",
+                      Description = "This endpoint generates a JWT token if the provided credentials are correct.")]
+        [SwaggerResponse(200, "Returns Ok if the token was successfully generated", typeof(string))]
+        [SwaggerResponse(401, "Returns Unauthorized if credentials are incorrect")]
         public IActionResult Login(string _userName, string _password)
         {
             if (_userName == "admin" && _password == "123")
